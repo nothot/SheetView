@@ -11,7 +11,7 @@
 
 @class SheetView;
 @protocol SheetViewDataSource <NSObject>
-
+@required
 - (NSInteger)sheetView:(SheetView *)sheetView numberOfRowsInSection:(NSInteger)section;
 - (NSInteger)sheetView:(SheetView *)sheetView numberOfColsInSection:(NSInteger)section;
 - (NSString *)sheetView:(SheetView *)sheetView cellForContentItemAtIndexRow:(NSIndexPath *)indexRow indexCol:(NSIndexPath *)indexCol;
@@ -22,7 +22,7 @@
 @end
 
 @protocol SheetViewDelegate <NSObject>
-
+@required
 - (CGFloat)sheetView:(SheetView *)sheetView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (CGFloat)sheetView:(SheetView *)sheetView widthForColAtIndexPath:(NSIndexPath *)indexPath;
 

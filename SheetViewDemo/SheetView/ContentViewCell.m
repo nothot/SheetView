@@ -72,6 +72,11 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     UICollectionViewCell *innerCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"inner.cell" forIndexPath:indexPath];
+    if (innerCell) {
+        for (UIView *view in innerCell.contentView.subviews) {
+            [view removeFromSuperview];
+        }
+    }
     innerCell.backgroundColor = [UIColor whiteColor];
     CGFloat width = self.sizeForItemBlock(nil, indexPath).width;
     CGFloat height = self.sizeForItemBlock(nil, indexPath).height;
