@@ -112,6 +112,9 @@ static NSString *contentViewCellId = @"content.tableview.cell";
     self.topView.frame = CGRectMake(colWidth, 0, sheetViewWidth - colWidth, rowHeight);
     self.contentView.frame = CGRectMake(colWidth, rowHeight, sheetViewWidth - colWidth, sheetViewHeight - rowHeight);
     
+    if (self.sheetHeadLabel) {
+        [self.sheetHeadLabel removeFromSuperview];
+    }
     self.sheetHeadLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, colWidth, rowHeight)];
     self.sheetHeadLabel.text = self.sheetHead;
     self.sheetHeadLabel.textColor = [UIColor blackColor];
