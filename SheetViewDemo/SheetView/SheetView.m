@@ -196,6 +196,11 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         }
         self.topView.contentOffset = scroll.contentOffset;
     };
+    if ([self.dataSource respondsToSelector:@selector(sheetView:cellWithColorAtIndexRow:)]) {
+        contentCell.cellWithColorBlock = ^BOOL(NSIndexPath *indexPathInner) {
+            return [self.dataSource sheetView:self cellWithColorAtIndexRow:indexPath];
+        };
+    }
     contentCell.backgroundColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1];
     contentCell.cellCollectionView.frame = CGRectMake(0, 0, self.frame.size.width - width, height);
     [contentCell.cellCollectionView reloadData];

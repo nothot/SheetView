@@ -77,7 +77,9 @@
             [view removeFromSuperview];
         }
     }
-    innerCell.backgroundColor = [UIColor whiteColor];
+    BOOL hasColor = NO;
+    if (self.cellWithColorBlock) hasColor = self.cellWithColorBlock(indexPath);
+    innerCell.backgroundColor = hasColor?[UIColor colorWithRed:(0xf0 / 255.0)green:(0xf0 / 255.0)blue:(0xf0 / 255.0)alpha:1]:[UIColor whiteColor];
     CGFloat width = self.sizeForItemBlock(nil, indexPath).width;
     CGFloat height = self.sizeForItemBlock(nil, indexPath).height;
     CGRect rect = CGRectMake(0, 0, width, height);
