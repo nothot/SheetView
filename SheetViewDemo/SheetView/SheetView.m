@@ -213,8 +213,8 @@ BOOL didHorizontalScroll = NO;
         return;
     }
     ContentViewCell *willDisplayCell = (ContentViewCell *)cell;
-    ContentViewCell *didDisplayCell = (ContentViewCell *)tableView.visibleCells[0];
-    if (willDisplayCell.cellCollectionView.contentOffset.x != didDisplayCell.cellCollectionView.contentOffset.x) {
+    ContentViewCell *didDisplayCell = (ContentViewCell *)[tableView.visibleCells firstObject];
+    if (didDisplayCell && willDisplayCell.cellCollectionView.contentOffset.x != didDisplayCell.cellCollectionView.contentOffset.x) {
         willDisplayCell.cellCollectionView.contentOffset = didDisplayCell.cellCollectionView.contentOffset;
     }
     didHorizontalScroll = NO;
