@@ -209,7 +209,7 @@ BOOL didHorizontalScroll = NO;
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (!didHorizontalScroll) {
+    if (!didHorizontalScroll || [tableView isKindOfClass:[SheetLeftView class]]) {
         return;
     }
     ContentViewCell *willDisplayCell = (ContentViewCell *)cell;
