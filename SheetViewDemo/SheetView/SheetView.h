@@ -12,20 +12,27 @@
 @class SheetView;
 @protocol SheetViewDataSource <NSObject>
 @required
+//返回表格有多少行
 - (NSInteger)sheetView:(SheetView *)sheetView numberOfRowsInSection:(NSInteger)section;
+//返回表格有多少列
 - (NSInteger)sheetView:(SheetView *)sheetView numberOfColsInSection:(NSInteger)section;
+//返回表格某行某列位置上需要显示的内容
 - (NSString *)sheetView:(SheetView *)sheetView cellForContentItemAtIndexRow:(NSIndexPath *)indexRow indexCol:(NSIndexPath *)indexCol;
-
+//返回表格左侧标题列每行需要显示的内容
 - (NSString *)sheetView:(SheetView *)sheetView cellForLeftColAtIndexPath:(NSIndexPath*)indexPath;
+//返回表格上边标题行每列需要显示的内容
 - (NSString *)sheetView:(SheetView *)sheetView cellForTopRowAtIndexPath:(NSIndexPath*)indexPath;
 
 @optional
+//返回表格某行是否需要填充颜色
 - (BOOL)sheetView:(SheetView *)sheetView cellWithColorAtIndexRow:(NSIndexPath *)indexRow;
 @end
 
 @protocol SheetViewDelegate <NSObject>
 @required
+//返回表格每行的高度
 - (CGFloat)sheetView:(SheetView *)sheetView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
+//返回表格每列的宽度
 - (CGFloat)sheetView:(SheetView *)sheetView widthForColAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
@@ -36,7 +43,7 @@
 @property (nonatomic, strong) id<SheetViewDelegate> delegate;
 @property (nonatomic, strong) NSString *sheetHead;
 
-
+//表格刷新
 - (void)reloadData;
 
 @end

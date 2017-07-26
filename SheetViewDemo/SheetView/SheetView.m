@@ -212,8 +212,10 @@ BOOL didHorizontalScroll = NO;
     if (!didHorizontalScroll) {
         return;
     }
-    if (((ContentViewCell *)cell).cellCollectionView.contentOffset.x != ((ContentViewCell *)tableView.visibleCells[0]).cellCollectionView.contentOffset.x) {
-        ((ContentViewCell *)cell).cellCollectionView.contentOffset = ((ContentViewCell *)tableView.visibleCells[0]).cellCollectionView.contentOffset;
+    ContentViewCell *willDisplayCell = (ContentViewCell *)cell;
+    ContentViewCell *didDisplayCell = (ContentViewCell *)tableView.visibleCells[0];
+    if (willDisplayCell.cellCollectionView.contentOffset.x != didDisplayCell.cellCollectionView.contentOffset.x) {
+        willDisplayCell.cellCollectionView.contentOffset = didDisplayCell.cellCollectionView.contentOffset;
     }
     didHorizontalScroll = NO;
 }
