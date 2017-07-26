@@ -57,4 +57,9 @@
     return 80;
 }
 
+- (BOOL)sheetView:(SheetView *)sheetView cellWithColorAtIndexRow:(NSIndexPath *)indexRow
+{
+    return (indexRow.row%2 != 0)?YES:NO;
+}
+
 @end
