@@ -35,6 +35,8 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 @property (nonatomic, strong) SheetTopView *topView;
 @property (nonatomic, strong) SheetContentView *contentView;
 @property (nonatomic, strong) UILabel *sheetHeadLabel;
+@property (nonatomic, assign) CGFloat rowHeight;
+@property (nonatomic, assign) CGFloat colWidth;
 
 @end
 @implementation SheetView
@@ -78,6 +80,8 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         [self addSubview:self.leftView];
         [self addSubview:self.topView];
         [self addSubview:self.contentView];
+        
+        self.autoResizingItemMask = YES;
     }
     
     return self;
@@ -103,8 +107,8 @@ static NSString *contentViewCellId = @"content.tableview.cell";
     [super layoutSubviews];
     CGFloat sheetViewWidth = self.frame.size.width;
     CGFloat sheetViewHeight = self.frame.size.height;
-    CGFloat rowHeight = [self.delegate sheetView:self heightForRowAtIndexPath:nil];
-    CGFloat colWidth = [self.delegate sheetView:self widthForColAtIndexPath:nil];
+    CGFloat rowHeight = self.rowHeight;
+    CGFloat colWidth = self.colWidth;
     self.leftView.frame = CGRectMake(0, rowHeight, colWidth, sheetViewHeight - rowHeight);
     self.topView.frame = CGRectMake(colWidth, 0, sheetViewWidth - colWidth, rowHeight);
     self.contentView.frame = CGRectMake(colWidth, rowHeight, sheetViewWidth - colWidth, sheetViewHeight - rowHeight);
@@ -124,16 +128,47 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 - (void)reloadData
 {
-    self.sheetHeadLabel.frame = CGRectMake(0, 0, [self.delegate sheetView:self widthForColAtIndexPath:nil], [self.delegate sheetView:self heightForRowAtIndexPath:nil]);
+    self.rowHeight =0;
+    self.colWidth = 0;
+    self.sheetHeadLabel.frame = CGRectMake(0, 0, self.colWidth, self.rowHeight);
     [self.leftView reloadData];
     [self.topView reloadData];
     [self.contentView reloadData];
 }
 
+# pragma mark -- Getter
+- (CGFloat)rowHeight
+{
+    if (_rowHeight == 0) {
+        _rowHeight = [self.delegate sheetView:self heightForRowAtIndexPath:nil];
+        if (self.autoResizingItemMask) {
+            NSInteger numOfRow = [self.dataSource sheetView:self numberOfRowsInSection:0];
+            if ((numOfRow + 1) * _rowHeight < self.frame.size.height) {
+                _rowHeight = self.frame.size.height/(numOfRow + 1);
+            }
+        }
+    }
+    return _rowHeight;
+}
+
+- (CGFloat)colWidth
+{
+    if (_colWidth == 0) {
+        _colWidth = [self.delegate sheetView:self widthForColAtIndexPath:nil];
+        if (self.autoResizingItemMask) {
+            NSInteger numOfCol = [self.dataSource sheetView:self numberOfColsInSection:0];
+            if ((numOfCol + 1) * _colWidth < self.frame.size.width) {
+                _colWidth = self.frame.size.width/(numOfCol + 1);
+            }
+        }
+    }
+    return _colWidth;
+}
+
 # pragma mark -- UITableViewDelegate && UITableViewDataSource
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
+    return self.rowHeight;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -143,6 +178,18 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    CGFloat width = self.colWidth;
+    CGFloat height = self.rowHeight;
+    if (self.autoResizingItemMask) {
+        NSInteger numOfRow = [self.dataSource sheetView:self numberOfRowsInSection:indexPath.section];
+        if ((numOfRow + 1) * height < self.frame.size.height) {
+            height = self.frame.size.height/(numOfRow + 1);
+        }
+        NSInteger numOfCol = [self.dataSource sheetView:self numberOfColsInSection:indexPath.section];
+        if ((numOfCol + 1) * width < self.frame.size.width) {
+            width = self.frame.size.width/(numOfCol + 1);
+        }
+    }
     if ([tableView isKindOfClass:[SheetLeftView class]]) {
         UITableViewCell *leftCell = [tableView dequeueReusableCellWithIdentifier:leftViewCellId];
         if (leftCell == nil)
@@ -156,8 +203,6 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         leftCell.backgroundColor = [UIColor colorWithRed:(0xf0 / 255.0)green:(0xf0 / 255.0)blue:(0xf0 / 255.0)alpha:1];
         leftCell.layer.borderColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1].CGColor;
         leftCell.layer.borderWidth = 1;
-        CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPath];
-        CGFloat height = [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
         CGRect rect = CGRectMake(0, 0, width, height);
         UILabel *label = [[UILabel alloc] initWithFrame:rect];
         label.text = [self.dataSource sheetView:self cellForLeftColAtIndexPath:indexPath];
@@ -168,8 +213,6 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         return leftCell;
     }
 
-    CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPath];
-    CGFloat height = [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
     ContentViewCell *contentCell = [tableView dequeueReusableCellWithIdentifier:contentViewCellId];
     if (contentCell == nil)
     {
@@ -230,9 +273,7 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 - (CGSize)collectionView:(UICollectionView *)uiCollectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPath];
-    CGFloat height = [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
-    return CGSizeMake(width, height);
+    return CGSizeMake(self.colWidth, self.rowHeight);
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -243,9 +284,7 @@ static NSString *contentViewCellId = @"content.tableview.cell";
             [view removeFromSuperview];
         }
         topCell.backgroundColor = [UIColor colorWithRed:(0xf0 / 255.0)green:(0xf0 / 255.0)blue:(0xf0 / 255.0)alpha:1];
-        CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPath];
-        CGFloat height = [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
-        CGRect rect = CGRectMake(0, 0, width, height);
+        CGRect rect = CGRectMake(0, 0, self.colWidth, self.rowHeight);
         UILabel *label = [[UILabel alloc] initWithFrame:rect];
         label.text = [self.dataSource sheetView:self cellForTopRowAtIndexPath:indexPath];
         label.textColor = [UIColor blackColor];

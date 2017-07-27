@@ -17,7 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    SheetView *sheetView = [[SheetView alloc] initWithFrame:CGRectMake(0, 20, self.view.frame.size.width, self.view.frame.size.height)];
+    SheetView *sheetView = [[SheetView alloc] initWithFrame:CGRectMake(0, 20, self.view.frame.size.width, self.view.frame.size.height-20)];
     sheetView.dataSource = self;
     sheetView.delegate = self;
     sheetView.sheetHead = @"sheet";

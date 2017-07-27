@@ -41,7 +41,8 @@
 
 @property (nonatomic, strong) id<SheetViewDataSource> dataSource;
 @property (nonatomic, strong) id<SheetViewDelegate> delegate;
-@property (nonatomic, strong) NSString *sheetHead;
+@property (nonatomic, strong) NSString *sheetHead;//第一行第一列格子要显示的内容
+@property (nonatomic, assign) BOOL autoResizingItemMask;//自动调整行高和列宽以适应SheetView，仅当总行高或总列宽小于SheetView的尺寸时有效，默认为YES
 
 //表格刷新
 - (void)reloadData;
