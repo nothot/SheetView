@@ -38,7 +38,6 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 @end
 @implementation SheetView
-BOOL didHorizontalScroll = NO;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -193,7 +192,6 @@ BOOL didHorizontalScroll = NO;
             cell.cellCollectionView.contentOffset = scroll.contentOffset;
         }
         self.topView.contentOffset = scroll.contentOffset;
-        didHorizontalScroll = YES;
     };
     if ([self.dataSource respondsToSelector:@selector(sheetView:cellWithColorAtIndexRow:)]) {
         contentCell.cellWithColorBlock = ^BOOL(NSIndexPath *indexPathInner) {
@@ -209,15 +207,14 @@ BOOL didHorizontalScroll = NO;
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (!didHorizontalScroll || [tableView isKindOfClass:[SheetLeftView class]]) {
+    if ([tableView isKindOfClass:[SheetLeftView class]]) {
         return;
     }
     ContentViewCell *willDisplayCell = (ContentViewCell *)cell;
     ContentViewCell *didDisplayCell = (ContentViewCell *)[tableView.visibleCells firstObject];
-    if (didDisplayCell && willDisplayCell.cellCollectionView.contentOffset.x != didDisplayCell.cellCollectionView.contentOffset.x) {
+    if (willDisplayCell.cellCollectionView && didDisplayCell.cellCollectionView && willDisplayCell.cellCollectionView.contentOffset.x != didDisplayCell.cellCollectionView.contentOffset.x) {
         willDisplayCell.cellCollectionView.contentOffset = didDisplayCell.cellCollectionView.contentOffset;
     }
-    didHorizontalScroll = NO;
 }
 
 # pragma mark -- UICollectionViewDelegate && UICollectionViewDataSource
