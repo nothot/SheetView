@@ -35,8 +35,6 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 @property (nonatomic, strong) SheetTopView *topView;
 @property (nonatomic, strong) SheetContentView *contentView;
 @property (nonatomic, strong) UILabel *sheetHeadLabel;
-@property (nonatomic, assign) CGFloat rowHeight;
-@property (nonatomic, assign) CGFloat colWidth;
 
 @end
 @implementation SheetView
@@ -107,16 +105,14 @@ static NSString *contentViewCellId = @"content.tableview.cell";
     [super layoutSubviews];
     CGFloat sheetViewWidth = self.frame.size.width;
     CGFloat sheetViewHeight = self.frame.size.height;
-    CGFloat rowHeight = self.rowHeight;
-    CGFloat colWidth = self.colWidth;
-    self.leftView.frame = CGRectMake(0, rowHeight, colWidth, sheetViewHeight - rowHeight);
-    self.topView.frame = CGRectMake(colWidth, 0, sheetViewWidth - colWidth, rowHeight);
-    self.contentView.frame = CGRectMake(colWidth, rowHeight, sheetViewWidth - colWidth, sheetViewHeight - rowHeight);
+    self.leftView.frame = CGRectMake(0, self.titleRowHeight, self.titleColWidth, sheetViewHeight - self.titleRowHeight);
+    self.topView.frame = CGRectMake(self.titleColWidth, 0, sheetViewWidth - self.titleColWidth, self.titleRowHeight);
+    self.contentView.frame = CGRectMake(self.titleColWidth, self.titleRowHeight, sheetViewWidth - self.titleColWidth, sheetViewHeight - self.titleRowHeight);
     
     if (self.sheetHeadLabel) {
         [self.sheetHeadLabel removeFromSuperview];
     }
-    self.sheetHeadLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, colWidth, rowHeight)];
+    self.sheetHeadLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.titleColWidth, self.titleRowHeight)];
     self.sheetHeadLabel.text = self.sheetHead;
     self.sheetHeadLabel.textColor = [UIColor blackColor];
     self.sheetHeadLabel.textAlignment = NSTextAlignmentCenter;
@@ -128,47 +124,16 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 - (void)reloadData
 {
-    self.rowHeight =0;
-    self.colWidth = 0;
-    self.sheetHeadLabel.frame = CGRectMake(0, 0, self.colWidth, self.rowHeight);
+    self.sheetHeadLabel.frame = CGRectMake(0, 0, self.titleColWidth, self.titleRowHeight);
     [self.leftView reloadData];
     [self.topView reloadData];
     [self.contentView reloadData];
 }
 
-# pragma mark -- Getter
-- (CGFloat)rowHeight
-{
-    if (_rowHeight == 0) {
-        _rowHeight = [self.delegate sheetView:self heightForRowAtIndexPath:nil];
-        if (self.autoResizingItemMask) {
-            NSInteger numOfRow = [self.dataSource sheetView:self numberOfRowsInSection:0];
-            if ((numOfRow + 1) * _rowHeight < self.frame.size.height) {
-                _rowHeight = self.frame.size.height/(numOfRow + 1);
-            }
-        }
-    }
-    return _rowHeight;
-}
-
-- (CGFloat)colWidth
-{
-    if (_colWidth == 0) {
-        _colWidth = [self.delegate sheetView:self widthForColAtIndexPath:nil];
-        if (self.autoResizingItemMask) {
-            NSInteger numOfCol = [self.dataSource sheetView:self numberOfColsInSection:0];
-            if ((numOfCol + 1) * _colWidth < self.frame.size.width) {
-                _colWidth = self.frame.size.width/(numOfCol + 1);
-            }
-        }
-    }
-    return _colWidth;
-}
-
 # pragma mark -- UITableViewDelegate && UITableViewDataSource
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return self.rowHeight;
+    return [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -178,18 +143,6 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CGFloat width = self.colWidth;
-    CGFloat height = self.rowHeight;
-    if (self.autoResizingItemMask) {
-        NSInteger numOfRow = [self.dataSource sheetView:self numberOfRowsInSection:indexPath.section];
-        if ((numOfRow + 1) * height < self.frame.size.height) {
-            height = self.frame.size.height/(numOfRow + 1);
-        }
-        NSInteger numOfCol = [self.dataSource sheetView:self numberOfColsInSection:indexPath.section];
-        if ((numOfCol + 1) * width < self.frame.size.width) {
-            width = self.frame.size.width/(numOfCol + 1);
-        }
-    }
     if ([tableView isKindOfClass:[SheetLeftView class]]) {
         UITableViewCell *leftCell = [tableView dequeueReusableCellWithIdentifier:leftViewCellId];
         if (leftCell == nil)
@@ -203,6 +156,10 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         leftCell.backgroundColor = [UIColor colorWithRed:(0xf0 / 255.0)green:(0xf0 / 255.0)blue:(0xf0 / 255.0)alpha:1];
         leftCell.layer.borderColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1].CGColor;
         leftCell.layer.borderWidth = 1;
+        
+        CGFloat width = self.titleColWidth;
+        CGFloat height = [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
+        
         CGRect rect = CGRectMake(0, 0, width, height);
         UILabel *label = [[UILabel alloc] initWithFrame:rect];
         label.text = [self.dataSource sheetView:self cellForLeftColAtIndexPath:indexPath];
@@ -226,8 +183,9 @@ static NSString *contentViewCellId = @"content.tableview.cell";
     contentCell.numberOfItemsBlock = ^NSInteger(NSInteger section) {
         return [self.dataSource sheetView:self numberOfColsInSection:section];
     };
-    contentCell.sizeForItemBlock = ^CGSize(UICollectionViewLayout * collectionViewLayout, NSIndexPath *indexPath) {
-        
+    contentCell.sizeForItemBlock = ^CGSize(UICollectionViewLayout * collectionViewLayout, NSIndexPath *indexPathInner) {
+        CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPathInner];
+        CGFloat height = [self.delegate sheetView:self heightForRowAtIndexPath:indexPath];
         return CGSizeMake(width, height);
     };
     contentCell.contentViewCellDidScrollBlock = ^(UIScrollView *scroll) {
@@ -242,7 +200,7 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         };
     }
     contentCell.backgroundColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1];
-    contentCell.cellCollectionView.frame = CGRectMake(0, 0, self.frame.size.width - width, height);
+    contentCell.cellCollectionView.frame = CGRectMake(0, 0, self.frame.size.width - self.titleColWidth, [self.delegate sheetView:self heightForRowAtIndexPath:indexPath]);
     [contentCell.cellCollectionView reloadData];
     
     return contentCell;
@@ -273,7 +231,9 @@ static NSString *contentViewCellId = @"content.tableview.cell";
 
 - (CGSize)collectionView:(UICollectionView *)uiCollectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return CGSizeMake(self.colWidth, self.rowHeight);
+    CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPath];
+    CGFloat height = self.titleRowHeight;
+    return CGSizeMake(width, height);
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -284,7 +244,11 @@ static NSString *contentViewCellId = @"content.tableview.cell";
             [view removeFromSuperview];
         }
         topCell.backgroundColor = [UIColor colorWithRed:(0xf0 / 255.0)green:(0xf0 / 255.0)blue:(0xf0 / 255.0)alpha:1];
-        CGRect rect = CGRectMake(0, 0, self.colWidth, self.rowHeight);
+        topCell.layer.borderColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1].CGColor;
+        topCell.layer.borderWidth = 1;
+        CGFloat width = [self.delegate sheetView:self widthForColAtIndexPath:indexPath];
+        CGFloat height = self.titleRowHeight;
+        CGRect rect = CGRectMake(0, 0, width, height);
         UILabel *label = [[UILabel alloc] initWithFrame:rect];
         label.text = [self.dataSource sheetView:self cellForTopRowAtIndexPath:indexPath];
         label.textColor = [UIColor blackColor];

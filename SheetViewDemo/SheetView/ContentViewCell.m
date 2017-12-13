@@ -31,6 +31,12 @@
         layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         self.cellCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) collectionViewLayout:layout];
         self.cellCollectionView.showsHorizontalScrollIndicator = NO;
+        if (@available(iOS 11.0, *)) {
+            self.cellCollectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAlways;
+        } else {
+            // Fallback on earlier versions
+        }
+
         self.cellCollectionView.backgroundColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1];
         self.cellCollectionView.layer.borderColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1].CGColor;
         self.cellCollectionView.layer.borderWidth = 1.0f;
@@ -77,6 +83,9 @@
             [view removeFromSuperview];
         }
     }
+    innerCell.layer.borderColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1].CGColor;
+    innerCell.layer.borderWidth = 1;
+    
     BOOL hasColor = NO;
     if (self.cellWithColorBlock) hasColor = self.cellWithColorBlock(indexPath);
     innerCell.backgroundColor = hasColor?[UIColor colorWithRed:(0xf0 / 255.0)green:(0xf0 / 255.0)blue:(0xf0 / 255.0)alpha:1]:[UIColor whiteColor];

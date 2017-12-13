@@ -21,6 +21,8 @@
     sheetView.dataSource = self;
     sheetView.delegate = self;
     sheetView.sheetHead = @"sheet";
+    sheetView.titleRowHeight = 60;
+    sheetView.titleColWidth = 80;
     [self.view addSubview:sheetView];
     
 }
@@ -29,7 +31,7 @@
 
 - (NSInteger)sheetView:(SheetView *)sheetView numberOfRowsInSection:(NSInteger)section
 {
-    return 50;
+    return 40;
 }
 - (NSInteger)sheetView:(SheetView *)sheetView numberOfColsInSection:(NSInteger)section
 {
@@ -37,15 +39,16 @@
 }
 - (NSString *)sheetView:(SheetView *)sheetView cellForContentItemAtIndexRow:(NSIndexPath *)indexRow indexCol:(NSIndexPath *)indexCol
 {
-    return @"data";
+    return [NSString stringWithFormat:@"data(%ld,%ld)", (long)indexRow.row, (long)indexCol.row];
 }
+
 - (NSString *)sheetView:(SheetView *)sheetView cellForLeftColAtIndexPath:(NSIndexPath*)indexPath
 {
-    return @"row";
+    return [NSString stringWithFormat:@"row(%ld)", (long)indexPath.row];
 }
 - (NSString *)sheetView:(SheetView *)sheetView cellForTopRowAtIndexPath:(NSIndexPath*)indexPath
 {
-    return @"col";
+    return [NSString stringWithFormat:@"col(%ld)", (long)indexPath.row];
 }
 
 - (CGFloat)sheetView:(SheetView *)sheetView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -54,7 +57,7 @@
 }
 - (CGFloat)sheetView:(SheetView *)sheetView widthForColAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 80;
+    return 80 + 2 * indexPath.row;
 }
 
 - (BOOL)sheetView:(SheetView *)sheetView cellWithColorAtIndexRow:(NSIndexPath *)indexRow
