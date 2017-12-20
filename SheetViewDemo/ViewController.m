@@ -57,12 +57,17 @@
 }
 - (CGFloat)sheetView:(SheetView *)sheetView widthForColAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 80 + 2 * indexPath.row;
+    return 80;
 }
 
 - (BOOL)sheetView:(SheetView *)sheetView cellWithColorAtIndexRow:(NSIndexPath *)indexRow
 {
     return (indexRow.row%2 != 0)?YES:NO;
+}
+
+-(void)sheetView:(SheetView *)sheetView didSelectItemAtIndexRow:(NSIndexPath *)indexRow indexCol:(NSIndexPath *)indexCol
+{
+    NSLog(@"点击 row %ld, col %ld", (long)indexRow.row, (long)indexCol.row);
 }
 
 @end

@@ -35,6 +35,7 @@
 //返回表格每列的宽度
 - (CGFloat)sheetView:(SheetView *)sheetView widthForColAtIndexPath:(NSIndexPath *)indexPath;
 
+- (void)sheetView:(SheetView *)sheetView didSelectItemAtIndexRow:(NSIndexPath *)indexRow indexCol:(NSIndexPath *)indexCol;
 @end
 
 @interface SheetView : UIView
@@ -42,7 +43,6 @@
 @property (nonatomic, strong) id<SheetViewDataSource> dataSource;
 @property (nonatomic, strong) id<SheetViewDelegate> delegate;
 @property (nonatomic, strong) NSString *sheetHead;//第一行第一列格子要显示的内容
-@property (nonatomic, assign) BOOL autoResizingItemMask;//自动调整行高和列宽以适应SheetView，仅当总行高或总列宽小于SheetView的尺寸时有效，默认为YES
 
 @property (nonatomic, assign) CGFloat titleColWidth;//左侧标题列宽度（必须设置）
 @property (nonatomic, assign) CGFloat titleRowHeight;//上边标题行高度（必须设置）

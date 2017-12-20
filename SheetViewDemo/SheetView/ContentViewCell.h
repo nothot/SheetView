@@ -13,6 +13,7 @@ typedef NSInteger(^numberOfItemsInSectionBlock)(NSInteger section);
 typedef CGSize(^sizeForItemAtIndexPathBlock)(UICollectionViewLayout * collectionViewLayout, NSIndexPath *indexPath);
 typedef void(^ContentViewCellDidScrollBlock)(UIScrollView *scroll);
 typedef BOOL(^cellWithColorAtIndexPathBlock)(NSIndexPath *indexPath);
+typedef void(^didSelectItemBlock)(NSIndexPath *indexPath);
 
 @interface ContentViewCell : UITableViewCell
 @property (nonatomic, strong) cellForItemAtIndexPathBlock cellForItemBlock;
@@ -20,6 +21,7 @@ typedef BOOL(^cellWithColorAtIndexPathBlock)(NSIndexPath *indexPath);
 @property (nonatomic, strong) sizeForItemAtIndexPathBlock sizeForItemBlock;
 @property (nonatomic, strong) ContentViewCellDidScrollBlock contentViewCellDidScrollBlock;
 @property (nonatomic, strong) cellWithColorAtIndexPathBlock cellWithColorBlock;
+@property (nonatomic, strong) didSelectItemBlock cellDidSelectBlock;
 
 @property (nonatomic, strong) UICollectionView *cellCollectionView;
 @end

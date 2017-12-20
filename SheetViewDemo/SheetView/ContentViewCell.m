@@ -101,6 +101,13 @@
     return innerCell;
 }
 
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.cellDidSelectBlock) {
+        self.cellDidSelectBlock(indexPath);
+    }
+}
+
 
 
 @end

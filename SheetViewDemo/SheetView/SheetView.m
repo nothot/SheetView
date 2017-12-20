@@ -73,13 +73,12 @@ static NSString *contentViewCellId = @"content.tableview.cell";
         self.contentView.delegate = self;
         self.contentView.showsVerticalScrollIndicator = NO;
         self.contentView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        self.contentView.backgroundColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1];;
+        self.contentView.backgroundColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1];
         
         [self addSubview:self.leftView];
         [self addSubview:self.topView];
         [self addSubview:self.contentView];
         
-        self.autoResizingItemMask = YES;
     }
     
     return self;
@@ -199,6 +198,12 @@ static NSString *contentViewCellId = @"content.tableview.cell";
             return [self.dataSource sheetView:self cellWithColorAtIndexRow:indexPath];
         };
     }
+    contentCell.cellDidSelectBlock = ^(NSIndexPath *indexPathInner) {
+        if ([self.delegate respondsToSelector:@selector(sheetView:didSelectItemAtIndexRow:indexCol:)]) {
+            [self.delegate sheetView:self didSelectItemAtIndexRow:indexPath indexCol:indexPathInner];
+        }
+    };
+    
     contentCell.backgroundColor = [UIColor colorWithRed:(0x90 / 255.0)green:(0x90 / 255.0)blue:(0x90 / 255.0)alpha:1];
     contentCell.cellCollectionView.frame = CGRectMake(0, 0, self.frame.size.width - self.titleColWidth, [self.delegate sheetView:self heightForRowAtIndexPath:indexPath]);
     [contentCell.cellCollectionView reloadData];
